@@ -142,18 +142,6 @@
             CCRenderBufferSetTriangle(buffer, i, i*3, (i*3)+1, (i*3)+2);
         }
         
-        //
-        // Linedraw render
-        buffer = [renderer enqueueLines:(areaTrianglePointCount/6) - 1 andVertexes:(areaTrianglePointCount/6) withState:self.renderState globalSortOrder:0];
-        for(int i = 0; i < areaTrianglePointCount/6; i++) {
-            CCVertex vertex;
-            vertex.position = GLKVector4Make(areaTrianglePoints[i*6].x, areaTrianglePoints[i*6].y, 0.0, 1.0);
-            vertex.color = GLKVector4Make(0.0, 0.0, 0.0, 1.0);
-            CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
-        }
-        for(int i = 0; i < (areaTrianglePointCount/6) - 1; i++) {
-            CCRenderBufferSetLine(buffer, i, i, i+1);
-        }
     }
 }
 
