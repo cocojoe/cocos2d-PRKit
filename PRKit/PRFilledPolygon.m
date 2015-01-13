@@ -31,6 +31,8 @@
 
 #import "PRFilledPolygon.h"
 #import "PRRatcliffTriangulator.h"
+#import "CCTexture_Private.h"
+#import "CCNode_Private.h"
 
 @interface PRFilledPolygon (privateMethods)
 
@@ -49,31 +51,31 @@
 /**
  Returns an autoreleased polygon.  Default triangulator is used (Ratcliff's).
  */
-+(id) filledPolygonWithPoints: (NSArray *) polygonPoints andTexture: (CCTexture2D *) fillTexture {
++(id) filledPolygonWithPoints: (NSArray *) polygonPoints andTexture: (CCTexture *) fillTexture {
     return [[PRFilledPolygon alloc] initWithPoints:polygonPoints andTexture:fillTexture];
 }
 
 /**
  Returns an autoreleased filled poly with a supplied triangulator.
  */
-+(id) filledPolygonWithPoints:(NSArray *)polygonPoints andTexture:(CCTexture2D *)fillTexture usingTriangulator: (id<PRTriangulator>) polygonTriangulator {
++(id) filledPolygonWithPoints:(NSArray *)polygonPoints andTexture:(CCTexture *)fillTexture usingTriangulator: (id<PRTriangulator>) polygonTriangulator {
     return [[PRFilledPolygon alloc] initWithPoints:polygonPoints andTexture:fillTexture usingTriangulator:polygonTriangulator];
 }
 
--(id) initWithPoints: (NSArray *) polygonPoints andTexture: (CCTexture2D *) fillTexture {
+-(id) initWithPoints: (NSArray *) polygonPoints andTexture: (CCTexture *) fillTexture {
     return [self initWithPoints:polygonPoints andTexture:fillTexture usingTriangulator:[[PRRatcliffTriangulator alloc] init]];
 }
 
--(id) initWithPoints:(NSArray *)polygonPoints andTexture:(CCTexture2D *)fillTexture usingTriangulator: (id<PRTriangulator>) polygonTriangulator {
+-(id) initWithPoints:(NSArray *)polygonPoints andTexture:(CCTexture *)fillTexture usingTriangulator: (id<PRTriangulator>) polygonTriangulator {
     if( (self=[super init])) {
 		
         self.triangulator = polygonTriangulator;
         
         [self setPoints:polygonPoints];
-		self.texture = fillTexture;
+        self.texture = fillTexture;
         
-        self.shaderProgram = [[CCShaderCache sharedShaderCache] programForKey:kCCShader_PositionTexture];
-	}
+        self.shader = [CCShader positionTextureColorShader];
+    }
 	
 	return self;
 }
@@ -106,33 +108,36 @@
 
 -(void) calculateTextureCoordinates {
     for (int j = 0; j < areaTrianglePointCount; j++) {
-        GLfloat scale = 1.0f/texture.pixelsWide * CC_CONTENT_SCALE_FACTOR();
+        GLfloat scale = 1.0f /_texture.pixelWidth * _texture.contentScale;
         textureCoordinates[j] = (ccVertex2F) { areaTrianglePoints[j].x * scale, areaTrianglePoints[j].y * scale };
-        textureCoordinates[j].y = 1 - textureCoordinates[j].y;
     }
 }
 
--(void) draw {
-    CC_NODE_DRAW_SETUP();
+-(void) draw:(CCRenderer *)renderer transform:(const GLKMatrix4 *)transform {
+    CCRenderBuffer buffer = [renderer enqueueTriangles:areaTrianglePointCount/3 andVertexes:areaTrianglePointCount withState:self.renderState globalSortOrder:0];
+
     
-    ccGLBindTexture2D( self.texture.name );
+    for (int i = 0; i < areaTrianglePointCount; i++)
+    {
+        CCVertex vertex;
+        vertex.position = GLKVector4Make(areaTrianglePoints[i].x, areaTrianglePoints[i].y, 0.0, 1.0);
+        vertex.color = GLKVector4Make(1.0, 1.0, 1.0, 1.0);
+        vertex.texCoord1 = GLKVector2Make(areaTrianglePoints[i].x / _texture.contentSize.width,
+                                          areaTrianglePoints[i].y / _texture.contentSize.height);
+        vertex.texCoord1 = GLKVector2Make(textureCoordinates[i].x,
+                                          textureCoordinates[i].y);
+        CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
+    }
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    
-    ccGLBlendFunc( blendFunc.src, blendFunc.dst);
-    
-    ccGLEnableVertexAttribs( kCCVertexAttribFlag_Position | kCCVertexAttribFlag_TexCoords );
-    
-    glVertexAttribPointer(kCCVertexAttrib_Position, 2, GL_FLOAT, GL_FALSE, 0, areaTrianglePoints);
-    glVertexAttribPointer(kCCVertexAttrib_TexCoords, 2, GL_FLOAT, GL_FALSE, 0, textureCoordinates);
-    
-    glDrawArrays(GL_TRIANGLES, 0, areaTrianglePointCount);
+    for (int i = 0; i < areaTrianglePointCount/3; i++)
+    {
+        CCRenderBufferSetTriangle(buffer, i, i*3, (i*3)+1, (i*3)+2);
+    }
 }
 
 -(void) updateBlendFunc {
 	// it's possible to have an untextured sprite
-	if( !texture || ! [texture hasPremultipliedAlpha] ) {
+	if( !_texture || ! [_texture hasPremultipliedAlpha] ) {
 		blendFunc.src = GL_SRC_ALPHA;
 		blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
 		//[self setOpacityModifyRGB:NO];
@@ -151,28 +156,28 @@
 	return blendFunc;
 }
 
--(void) setTexture:(CCTexture2D *) texture2D {
+-(void) setTexture:(CCTexture *) texture2D {
 	
 	// accept texture==nil as argument
-	NSAssert( !texture || [texture isKindOfClass:[CCTexture2D class]], @"setTexture expects a CCTexture2D. Invalid argument");
+	NSAssert( !_texture || [_texture isKindOfClass:[CCTexture class]], @"setTexture expects a CCTexture2D. Invalid argument");
 	
-	texture = texture2D;
+	_texture = texture2D;
 	ccTexParams texParams = { GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT };
-	[texture setTexParameters: &texParams];
+	[_texture setTexParameters: &texParams];
+    
 	
 	[self updateBlendFunc];
 	[self calculateTextureCoordinates];
 }
 
--(CCTexture2D *) texture {
-	return texture;
+-(CCTexture *) texture {
+	return _texture;
 }
 		 
 -(void) dealloc {
-    [super dealloc];
 	free(areaTrianglePoints);
 	free(textureCoordinates);
-	 texture = nil;
+	 _texture = nil;
     triangulator = nil;
 }
 

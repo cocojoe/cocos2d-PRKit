@@ -33,7 +33,6 @@
 #import <Foundation/Foundation.h>
 #import "PRTriangulator.h"
 
-
 @interface PRRatcliffTriangulator : NSObject<PRTriangulator> {
     
 }

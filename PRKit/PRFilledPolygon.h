@@ -37,7 +37,7 @@
 @private
 	int areaTrianglePointCount;
 
-	CCTexture2D *texture;
+	//CCTexture *texture;
 	ccBlendFunc blendFunc;
 	
 	ccVertex2F *areaTrianglePoints;
@@ -46,28 +46,29 @@
     id<PRTriangulator> triangulator;
 }
 
-@property (nonatomic, strong) CCTexture2D *texture;
+@property (nonatomic, strong) CCTexture *texture;
 @property (nonatomic, strong) id<PRTriangulator> triangulator;
+@property (nonatomic, strong) CCShader *shader;
 
 /**
  Returns an autoreleased polygon.  Default triangulator is used (Ratcliff's).
 */
-+(id) filledPolygonWithPoints: (NSArray *) polygonPoints andTexture: (CCTexture2D *) fillTexture;
++(id) filledPolygonWithPoints: (NSArray *) polygonPoints andTexture: (CCTexture *) fillTexture;
 
 /**
  Returns an autoreleased filled poly with a supplied triangulator.
  */
-+(id) filledPolygonWithPoints:(NSArray *)polygonPoints andTexture:(CCTexture2D *)fillTexture usingTriangulator: (id<PRTriangulator>) polygonTriangulator;
++(id) filledPolygonWithPoints:(NSArray *)polygonPoints andTexture:(CCTexture *)fillTexture usingTriangulator: (id<PRTriangulator>) polygonTriangulator;
 
 /**
  Initialize the polygon.  polygonPoints will be triangulated.  Default triangulator is used (Ratcliff).
 */
--(id) initWithPoints: (NSArray *) polygonPoints andTexture: (CCTexture2D *) fillTexture;
+-(id) initWithPoints: (NSArray *) polygonPoints andTexture: (CCTexture *) fillTexture;
 
 /**
  Initialize the polygon.  polygonPoints will be triangulated using the supplied triangulator.
 */
--(id) initWithPoints:(NSArray *)polygonPoints andTexture:(CCTexture2D *)fillTexture usingTriangulator: (id<PRTriangulator>) polygonTriangulator;
+-(id) initWithPoints:(NSArray *)polygonPoints andTexture:(CCTexture *)fillTexture usingTriangulator: (id<PRTriangulator>) polygonTriangulator;
 
 -(void) setPoints: (NSArray *) points;
 
