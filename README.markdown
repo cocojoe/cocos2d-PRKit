@@ -5,6 +5,8 @@ PRKit is a library of some small additions to the fantastic <a href="http://coco
 
 PRKit was contributed to the open source community by <a href="http://precognitiveresearch.com">Precognitive Research, LLC</a>.
 
+PRKit was updated to cocos2d's new render pipeline, introduced in cocos2d v3.x by <a href="https://www.sagasplayground.com">Saga's Playground</a>.
+
 License
 ----------
 This is licensed using the same license as cocos2d itself and provided with absolutely no warranty.  You are free to use the PRKit code as you wish as long as you keep the license in the source code.
@@ -13,6 +15,11 @@ This code uses the excellent <a href="http://www.flipcode.com/archives/Efficient
 
 Release Notes
 -------------
+
+##### Version 0.4 (2015-01-13)
+* Support for cocos2d 3.x
+* Added Texture Mapped polygon.
+* Added Triangulator for Triangle Strips ([More info](http://en.wikipedia.org/wiki/Triangle_strip)).
 
 ##### Version 0.3 (2013-02-24)
 * Fixed issue with Mac OS X and 64 bit (#9)
@@ -29,15 +36,19 @@ Installation
 Download the source and add the files under ''PRKit'' to your project:
 * PRFilledPolygon.h
 * PRFilledPolygon.m
+* PRTexturePolygon.h
+* PRTexturePolygon.m
 * PRTriangulator.h
 * PRRatcliffTriangulator.h
 * PRRatcliffTriangulator.mm
 * triangulate.h
-* triangulate.cpp 
+* triangulate.cpp
+* TriangleStripTriangulator.h
+* TriangleStripTriangulator.mm
 
 Compatibility
 -------------
-Tested with cocos2d 2.0 for iOS and Mac OS X.
+Tested with cocos2d 3.3 for iOS
 
 Other Documentation
 -------------------
