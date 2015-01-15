@@ -16,6 +16,11 @@ This code uses the excellent <a href="http://www.flipcode.com/archives/Efficient
 Release Notes
 -------------
 
+##### Version 0.4.1 (2015-01-15)
+* Updated SB 1.4
+* Warnings Fix
+* Prepare for SpriteBuilder Store
+
 ##### Version 0.4 (2015-01-13)
 * Support for cocos2d 3.x
 * Added Texture Mapped polygon.

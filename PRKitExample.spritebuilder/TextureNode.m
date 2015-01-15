@@ -21,9 +21,10 @@
     
     
     NSMutableArray* texPoints = [[NSMutableArray alloc] init];
-    [texPoints addObject:[NSValue valueWithCGPoint:ccp(0, 128)]];
+    
+    [texPoints addObject:[NSValue valueWithCGPoint:ccp(0, 100)]];
     [texPoints addObject:[NSValue valueWithCGPoint:ccp(0, 0)]];
-    [texPoints addObject:[NSValue valueWithCGPoint:ccp(256, 128)]];
+    [texPoints addObject:[NSValue valueWithCGPoint:ccp(100, 80)]];
     [texPoints addObject:[NSValue valueWithCGPoint:ccp(256, 0)]];
 
     self.textureChild = [PRTexturePolygon filledPolygonWithPoints:texPoints andTexture:[CCTexture textureWithFile:@"blueprint.png"] usingTriangulator:[[TriangleStripTriangulator alloc] init]];

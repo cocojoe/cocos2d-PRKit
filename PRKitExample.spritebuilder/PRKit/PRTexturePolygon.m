@@ -151,8 +151,8 @@
         blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
         //[self setOpacityModifyRGB:NO];
     } else {
-        blendFunc.src = CC_BLEND_SRC;
-        blendFunc.dst = CC_BLEND_DST;
+        blendFunc.src = GL_ONE;
+        blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
         //[self setOpacityModifyRGB:YES];
     }
 }
